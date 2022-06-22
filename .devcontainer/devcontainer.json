@@ -1,0 +1,6 @@
+{
+  "name": "Node.js",
+  "dockerFile": "Dockerfile",
+  "remoteUser": "node",
+  "settings": {} 
+}
