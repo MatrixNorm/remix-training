@@ -2,5 +2,6 @@
   "name": "Node.js",
   "dockerFile": "Dockerfile",
   "remoteUser": "node",
-  "settings": {} 
+  "settings": {},
+  "extensions": ["esbenp.prettier-vscode", "bradlc.vscode-tailwindcss"]
 }

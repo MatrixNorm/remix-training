@@ -1,9 +1,10 @@
-import { useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 import { getFilms } from "~/api/films";
 
 // on server
-export const loader = () => {
-  return getFilms();
+export const loader = ({ request }) => {
+  const title = new URL(request.url).searchParams.get("title");
+  return getFilms(title);
 };
 
 // on client
@@ -11,20 +12,13 @@ export const meta = () => ({
   title: "Films | Studio Ghibli",
 });
 
-export const links = () => [
-  {
-    rel: "stylesheet",
-    href: "styles",
-  },
-];
-
 export default function () {
   const films = useLoaderData();
   return (
     <div className="p-10 font-sans">
       <h1 className="text-4xl font-bold text-center pb-5">Studio Ghibli Films</h1>
 
-      <form className="mb-5">
+      <Form reloadDocument className="mb-5">
         <label className="font-bold">
           Search
           <input
@@ -40,14 +34,20 @@ export default function () {
             Search
           </button>
         </label>
-      </form>
+      </Form>
 
       <div className="grid grid-cols-4 gap-4">
         {films.map((film) => (
-          <div>
+          <Link
+            to={film.id}
+            title={film.title}
+            key={film.id}
+            className="hover:scale-105 cursor-pointer"
+            prefetch="none"
+          >
             <div>{film.title}</div>
             <img src={film.image} alt={film.title} />
-          </div>
+          </Link>
         ))}
       </div>
     </div>
