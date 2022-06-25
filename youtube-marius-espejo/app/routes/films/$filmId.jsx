@@ -2,7 +2,6 @@ import { Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { getFilmById } from "~/api/films";
 
 export const loader = ({ params }) => {
-  console.log("fetching film...", params.filmId);
   return getFilmById(params.filmId);
 };
 
@@ -37,6 +36,17 @@ export default function () {
         </div>
         <div className="flex-1">
           <Outlet />
+          <div>
+            <h2>Comments</h2>
+            <div>
+              {film.comments.map((comment) => (
+                <div>
+                  <div>{comment.name}</div>
+                  <p>{comment.message}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
