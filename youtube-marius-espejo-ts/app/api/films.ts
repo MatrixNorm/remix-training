@@ -1,5 +1,19 @@
+import { z } from "zod";
 import { dbRead } from "./utils";
 import { getCommentsByFilmId } from "./comments";
+
+const Film = z.object({
+  id: z.string(),
+  title: z.string(),
+  image: z.string(),
+  movie_banner: z.string(),
+  description: z.string(),
+  release_date: z.string(),
+  characters: z.array(Characters),
+  comments: z.array(Comments),
+});
+
+type Film = z.infer<typeof Film>;
 
 async function readFilms() {
   /* алиас ~ резолвится на этапе транспиляции, поэтому нельзя
