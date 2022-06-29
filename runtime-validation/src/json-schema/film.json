@@ -1,0 +1,36 @@
+{
+  "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/film.json",
+  "title": "Film",
+  "description": "Schema for the Fiml endpoint",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image": {
+      "type": "string"
+    },
+    "movie_banner": {
+      "type": "string"
+    },
+    "release_date": {
+      "type": "integer"
+    },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title"
+  ]
+}

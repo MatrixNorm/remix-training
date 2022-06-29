@@ -1,16 +1,16 @@
 import { z } from "zod";
 
-type Comment = {
+type Director = {
   id: string;
-  message: string;
-  film: Film;
+  name: string;
+  films: Film[];
 };
 
-const Comment: z.ZodType<Comment> = z.lazy(() =>
+const Director: z.ZodType<Director> = z.lazy(() =>
   z.object({
     id: z.string(),
-    message: z.string(),
-    film: Film,
+    name: z.string(),
+    films: z.array(Film),
   })
 );
 
@@ -18,11 +18,12 @@ const Film = z.lazy(() =>
   z.object({
     id: z.string(),
     title: z.string(),
-    comments: z.array(Comment),
+    director: Director,
   })
 );
 
 type Film = z.infer<typeof Film>;
+type Director_ = z.infer<typeof Director>;
 
 console.log(
   Film.safeParse({
