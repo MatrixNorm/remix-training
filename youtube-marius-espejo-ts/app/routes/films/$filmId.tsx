@@ -1,7 +1,18 @@
+import type { Character, Comment } from "~/api/TypesFromJsonSchema";
 import { Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { getFilmById } from "~/api/films";
 
-export const loader = ({ params }) => {
+type Film = {
+  id: string;
+  title: string;
+  description?: string | undefined;
+  image?: string | undefined;
+  movie_banner?: string | undefined;
+  characters: Character[];
+  comments: Comment[];
+};
+
+export const loader = ({ params }: any) => {
   return getFilmById(params.filmId);
 };
 
@@ -25,7 +36,7 @@ export default function () {
   );
 }
 
-function Characters({ characters }: { characters: Characters[] }) {
+function Characters({ characters }: { characters: Character[] }) {
   return (
     <div>
       <h3 className="text-2xl">Characters</h3>
@@ -47,7 +58,7 @@ function Characters({ characters }: { characters: Characters[] }) {
   );
 }
 
-function Comments({ comments }: { comments: Characters[] }) {
+function Comments({ comments }: { comments: Comment[] }) {
   return (
     <div>
       <h2>Comments</h2>

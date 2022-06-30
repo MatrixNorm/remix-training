@@ -1,17 +1,9 @@
-import type { Character, Film } from "./restEndpoints";
+import type { Character, Film } from "./TypesFromJsonSchema";
 import Ajv from "ajv";
 import * as filmRestApiSchema from "./schema/film.json";
 import * as characterRestApiSchema from "./schema/character.json";
 import { dbRead } from "./utils";
 import { getCommentsByFilmId } from "./comments";
-
-type FilmMap = {
-  [k: string]: Film;
-};
-
-type CharacterMap = {
-  [k: string]: Character;
-};
 
 const ajv = new Ajv();
 
@@ -20,32 +12,16 @@ const validator = {
   character: ajv.compile(characterRestApiSchema),
 };
 
-async function readFilms(): Promise<FilmMap> {
-  /* алиас ~ резолвится на этапе транспиляции, поэтому нельзя
-    делать динамический импорт по-типу
-      function read(path) {
-        let data = require(path)
-        ...
-      }
-      read("~/data/films")    
-  */
-  const externalData = await dbRead(require("~/data/films"));
-  const goodEntries = Object.entries(externalData).filter(([filmId, filmExt]) =>
-    validator.film(filmExt)
-  );
-  return Object.fromEntries(goodEntries) as FilmMap;
-}
+const readFilms = () => dbRead(require("~/data/films"));
+const readCharacters = () => dbRead(require("~/data/characters"));
 
-async function readCharacters(): Promise<CharacterMap> {
-  const externalData = await dbRead(require("~/data/characters"));
-  const goodEntries = Object.entries(externalData).filter(([charId, charExt]) =>
-    validator.character(charExt)
-  );
-  return Object.fromEntries(goodEntries) as CharacterMap;
-}
+export async function getFilms(title: string | null | undefined): Promise<Film[]> {
+  const nonSafeFilms = Object.values(await dbRead(require("~/data/films")));
 
-export async function getFilms(title: string | null): Promise<Film[]> {
-  const films = Object.values(await readFilms());
+  const films = nonSafeFilms.filter((nonSafeFilm) =>
+    validator.film(nonSafeFilm)
+  ) as Film[];
+
   if (title) {
     return films.filter((film) => film.title.toLowerCase().includes(title.toLowerCase()));
   }
@@ -55,21 +31,37 @@ export async function getFilms(title: string | null): Promise<Film[]> {
 export async function getFilmById(filmId: string) {
   const films = await readFilms();
   const characters = await readCharacters();
-  //const comments = await getCommentsByFilmId(filmId);
-  const film = films[filmId];
+  const comments = await getCommentsByFilmId(filmId);
+
+  const film = films[filmId] as Film;
+  if (!validator.film(film)) {
+    throw new Error("Bad film");
+  }
+  const safeCharacters = (film.characters || [])
+    .map((pId) => characters[pId])
+    .filter((character) => validator.character(character)) as Character[];
+
   return {
     ...film,
-    characters: (film.characters || []).map((pId) => characters[pId]),
-    //comments,
+    characters: safeCharacters,
+    comments,
   };
 }
 
 export const getCharacterById = async (characterId: string) => {
   const films = await readFilms();
   const characters = await readCharacters();
-  const character = characters[characterId];
+
+  const character = characters[characterId] as Character;
+  if (!validator.film(character)) {
+    throw new Error("Bad character");
+  }
+  const safeFilms = (character.films || [])
+    .map((pId) => films[pId])
+    .filter((film) => validator.film(film)) as Film[];
+
   return {
     ...character,
-    films: (character.films || []).map((filmId) => films[filmId]),
+    films: safeFilms,
   };
 };

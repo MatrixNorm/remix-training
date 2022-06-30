@@ -1,0 +1,27 @@
+{
+  "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/comment.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Comment",
+  "description": "Schema for the Character endpoint",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "filmId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "message",
+    "filmId"
+  ]
+}
