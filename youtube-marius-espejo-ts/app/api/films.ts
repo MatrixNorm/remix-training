@@ -5,13 +5,22 @@ import * as characterRestApiSchema from "./schema/character.json";
 import { dbRead } from "./utils";
 import { getCommentsByFilmId } from "./comments";
 
+type FilmMap = {
+  [k: string]: Film;
+};
+
+type CharacterMap = {
+  [k: string]: Character;
+};
+
 const ajv = new Ajv();
+
 const validator = {
   film: ajv.compile(filmRestApiSchema),
   character: ajv.compile(characterRestApiSchema),
 };
 
-async function readFilms() {
+async function readFilms(): Promise<FilmMap> {
   /* алиас ~ резолвится на этапе транспиляции, поэтому нельзя
     делать динамический импорт по-типу
       function read(path) {
@@ -24,45 +33,36 @@ async function readFilms() {
   const goodEntries = Object.entries(externalData).filter(([filmId, filmExt]) =>
     validator.film(filmExt)
   );
-  return Object.fromEntries(goodEntries) as {
-    [k: string]: Film;
-  };
+  return Object.fromEntries(goodEntries) as FilmMap;
 }
 
-async function readCharacters() {
+async function readCharacters(): Promise<CharacterMap> {
   const externalData = await dbRead(require("~/data/characters"));
   const goodEntries = Object.entries(externalData).filter(([charId, charExt]) =>
     validator.character(charExt)
   );
-  return Object.fromEntries(goodEntries) as {
-    [k: string]: Character;
-  };
+  return Object.fromEntries(goodEntries) as CharacterMap;
 }
 
-export const getFilms = async (title: string) => {
-  /*XXX spec
-    загружаем данные из непроверенного источника
-    надо проверять данные на соответствие спецификации
-    смотри clojure spec
-  */
+export async function getFilms(title: string | null): Promise<Film[]> {
   const films = Object.values(await readFilms());
   if (title) {
     return films.filter((film) => film.title.toLowerCase().includes(title.toLowerCase()));
   }
   return films;
-};
+}
 
-export const getFilmById = async (filmId: string) => {
+export async function getFilmById(filmId: string) {
   const films = await readFilms();
   const characters = await readCharacters();
-  const comments = await getCommentsByFilmId(filmId);
+  //const comments = await getCommentsByFilmId(filmId);
   const film = films[filmId];
   return {
     ...film,
     characters: (film.characters || []).map((pId) => characters[pId]),
-    comments,
+    //comments,
   };
-};
+}
 
 export const getCharacterById = async (characterId: string) => {
   const films = await readFilms();

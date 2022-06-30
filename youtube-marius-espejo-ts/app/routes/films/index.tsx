@@ -1,10 +1,26 @@
 import { Form, Link, useLoaderData } from "@remix-run/react";
-import { getFilms } from "~/api/films";
+import * as api from "~/api/films";
+
+/**
+ * Клиент делает спецификацию данных, которые ему необходимы для отображения страницы.
+ * Возвращаемое значение функции loader должно соответствовать этой спецификации.
+ * Таким образом получается контракт между клиентом и сервером.
+ *
+ * В данном случае спецификация делается через статическую типизацию. В случае
+ * Clojurescript можно использовать более выразительный Clojure Spec.
+ */
+type Film = {
+  id: string;
+  title: string;
+  description?: string | undefined;
+  image?: string | undefined;
+};
 
 // on server
-export const loader = ({ request }) => {
+export const loader = ({ request }: any): Promise<Film[]> => {
   const title = new URL(request.url).searchParams.get("title");
-  return getFilms(title);
+  // должен соответствовать типу Film
+  return api.getFilms(title);
 };
 
 // on client
@@ -13,10 +29,7 @@ export const meta = () => ({
 });
 
 export default function () {
-  const films = useLoaderData();
-  /**
-   *
-   */
+  const films = useLoaderData<Film[]>();
   return (
     <div className="p-10 font-sans">
       <h1 className="text-4xl font-bold text-center pb-5">Studio Ghibli Films</h1>
