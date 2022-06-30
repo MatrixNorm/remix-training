@@ -1,3 +1,4 @@
+import type { LoaderFunction } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import * as api from "~/api/films";
 
@@ -8,7 +9,7 @@ import * as api from "~/api/films";
  *
  * Обычно клиенту нужна только грубая спецификация - форма данных, опционально ли
  * поле или нет - ровно то, что требуется знать для правильной отрисовки даннызх.
- * Для этих целей достаточно статической типизации. Более точна семантика не должна
+ * Для этих целей достаточно статической типизации. Более точная семантика не должна
  * волновать клиента и есть проблема сервера. Именно сервер должен проверять, чтобы
  * дата рождения не была больше даты поступления в ВУЗ, например.
  */
@@ -20,7 +21,7 @@ type Film = {
 };
 
 // on server
-export const loader = ({ request }: any): Promise<Film[]> => {
+export const loader: LoaderFunction = ({ request }): Promise<Film[]> => {
   const title = new URL(request.url).searchParams.get("title");
   // должен соответствовать типу Film
   return api.getFilms(title);
