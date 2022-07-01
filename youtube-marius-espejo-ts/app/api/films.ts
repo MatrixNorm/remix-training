@@ -62,8 +62,12 @@ export const getCharacterById = async (characterId: string) => {
   const films = await _readFilms();
   const characters = await _readCharacters();
 
+  if (!(characterId in characters)) {
+    return null;
+  }
   const character = characters[characterId] as Character;
-  if (!validator.film(character)) {
+
+  if (!validator.character(character)) {
     throw new Error("Character data does not conform to schema");
   }
   const safeFilms = (character.films || [])

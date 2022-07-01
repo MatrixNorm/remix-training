@@ -1,4 +1,5 @@
 import type { LoaderFunction } from "@remix-run/node";
+import { Response } from "@remix-run/node";
 import { Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { getFilmById } from "~/api/films";
 
@@ -23,14 +24,19 @@ type Film = {
   }[];
 };
 
-export const loader: LoaderFunction = ({ params }): Promise<Film> => {
+export const loader: LoaderFunction = async ({ params }): Promise<Film> => {
   if (params.filmId) {
-    const film = getFilmById(params.filmId);
-    if (film === null) {
-      
+    const film = await getFilmById(params.filmId);
+    if (!film) {
+      throw new Response("Not Found", {
+        status: 404,
+      });
     }
+    return film;
   }
-  throw new Error("XXX 404?");
+  throw new Response("Not Found", {
+    status: 404,
+  });
 };
 
 export default function () {

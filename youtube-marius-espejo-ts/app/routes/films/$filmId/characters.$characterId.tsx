@@ -11,11 +11,19 @@ type Character = {
   }[];
 };
 
-export const loader: LoaderFunction = ({ params }): Promise<Character> => {
+export const loader: LoaderFunction = async ({ params }): Promise<Character> => {
   if (params.characterId) {
-    return getCharacterById(params.characterId);
+    const character = await getCharacterById(params.characterId);
+    if (!character) {
+      throw new Response("Not Found", {
+        status: 404,
+      });
+    }
+    return character;
   }
-  throw new Error("XXX 404?");
+  throw new Response("Not Found", {
+    status: 404,
+  });
 };
 
 export default function () {
