@@ -32,6 +32,9 @@ export const meta = () => ({
   title: "Films | Studio Ghibli",
 });
 
+/**
+ * Как посмотреть эту компоненту в изоляции в Storybook?
+ */
 export default function () {
   const films = useLoaderData<Film[]>();
   return (

@@ -1,6 +1,5 @@
 {
   "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/character.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Character",
   "description": "Schema for the Character endpoint",
   "type": "object",

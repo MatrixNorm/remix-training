@@ -1,6 +1,5 @@
 {
-  "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/comment.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/comment.json",  
   "title": "Comment",
   "description": "Schema for the Character endpoint",
   "type": "object",

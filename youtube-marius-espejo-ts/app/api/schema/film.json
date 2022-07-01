@@ -1,8 +1,7 @@
 {
-  "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/film.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MatrixNorm/remix-training/youtube-marius-espejo/film.json",  
   "title": "Film",
-  "description": "Schema for the Fiml endpoint",
+  "description": "Schema for the Film endpoint",
   "type": "object",
   "properties": {
     "id": {

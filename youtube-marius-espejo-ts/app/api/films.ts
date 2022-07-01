@@ -2,7 +2,7 @@ import type { Character, Film } from "./TypesFromJsonSchema";
 import Ajv from "ajv";
 import * as filmRestApiSchema from "./schema/film.json";
 import * as characterRestApiSchema from "./schema/character.json";
-import { dbRead } from "./utils";
+import { dbRead, isMap } from "./utils";
 import { getCommentsByFilmId } from "./comments";
 
 const ajv = new Ajv();
@@ -12,14 +12,21 @@ const validator = {
   character: ajv.compile(characterRestApiSchema),
 };
 
-const readFilms = () => dbRead(require("~/data/films"));
-const readCharacters = () => dbRead(require("~/data/characters"));
+function coerceFilm(film: unknown) {
+  if (isMap(film) && film?.release_date) {
+    return { ...film, release_date: +film.release_date };
+  }
+  return film;
+}
+
+const _readFilms = () => dbRead(require("~/data/films"));
+const _readCharacters = () => dbRead(require("~/data/characters"));
 
 export async function getFilms(title: string | null | undefined): Promise<Film[]> {
   const nonSafeFilms = Object.values(await dbRead(require("~/data/films")));
 
   const films = nonSafeFilms.filter((nonSafeFilm) =>
-    validator.film(nonSafeFilm)
+    validator.film(coerceFilm(nonSafeFilm))
   ) as Film[];
 
   if (title) {
@@ -29,13 +36,16 @@ export async function getFilms(title: string | null | undefined): Promise<Film[]
 }
 
 export async function getFilmById(filmId: string) {
-  const films = await readFilms();
-  const characters = await readCharacters();
+  const films = await _readFilms();
+  const characters = await _readCharacters();
   const comments = await getCommentsByFilmId(filmId);
 
-  const film = films[filmId] as Film;
+  if (!(filmId in films)) {
+    return null;
+  }
+  const film = coerceFilm(films[filmId]) as Film;
   if (!validator.film(film)) {
-    throw new Error("Bad film");
+    throw new Error("Film data does not conform to schema");
   }
   const safeCharacters = (film.characters || [])
     .map((pId) => characters[pId])
@@ -49,12 +59,12 @@ export async function getFilmById(filmId: string) {
 }
 
 export const getCharacterById = async (characterId: string) => {
-  const films = await readFilms();
-  const characters = await readCharacters();
+  const films = await _readFilms();
+  const characters = await _readCharacters();
 
   const character = characters[characterId] as Character;
   if (!validator.film(character)) {
-    throw new Error("Bad character");
+    throw new Error("Character data does not conform to schema");
   }
   const safeFilms = (character.films || [])
     .map((pId) => films[pId])

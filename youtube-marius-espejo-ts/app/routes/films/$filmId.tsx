@@ -3,7 +3,8 @@ import { Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { getFilmById } from "~/api/films";
 
 /**
- * Note: Похоже на Graphql фрагмент из Relay.
+ * Note: Похоже на Graphql фрагмент из Relay и передаёт ровно такую же
+ * информацию.
  */
 type Film = {
   id: string;
@@ -24,9 +25,12 @@ type Film = {
 
 export const loader: LoaderFunction = ({ params }): Promise<Film> => {
   if (params.filmId) {
-    return getFilmById(params.filmId);
+    const film = getFilmById(params.filmId);
+    if (film === null) {
+      
+    }
   }
-  throw new Error("XXX");
+  throw new Error("XXX 404?");
 };
 
 export default function () {
@@ -55,7 +59,7 @@ function Characters({ characters }: { characters: Film["characters"] }) {
       <h3 className="text-2xl">Characters</h3>
       <ul>
         {characters.map((character) => (
-          <li className="p-2">
+          <li key={character.id} className="p-2">
             <NavLink
               to={`characters/${character.id}`}
               className={({ isActive }) =>
@@ -77,7 +81,7 @@ function Comments({ comments }: { comments: Film["comments"] }) {
       <h2>Comments</h2>
       <div>
         {comments.map((comment) => (
-          <div>
+          <div key={comment.id}>
             <div>{comment.name}</div>
             <p>{comment.message}</p>
           </div>

@@ -1,5 +1,4 @@
 import type { LoaderFunction } from "@remix-run/node";
-import type { Film } from "~/api/TypesFromJsonSchema";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { getCharacterById } from "~/api/films";
 
@@ -16,7 +15,7 @@ export const loader: LoaderFunction = ({ params }): Promise<Character> => {
   if (params.characterId) {
     return getCharacterById(params.characterId);
   }
-  throw new Error("XXX");
+  throw new Error("XXX 404?");
 };
 
 export default function () {
