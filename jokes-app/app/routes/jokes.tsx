@@ -34,6 +34,15 @@ export const loader: LoaderFunction = async () => {
 export default function JokesRoute() {
   /*(i)*/
   const data = useLoaderData<LoaderData>();
+  /**
+   * Data overfetching problem
+   * -------------------------
+   * The component is using only joke `id` and `name`.
+   * No need to fetch `content`, `createdAt` and `updatedAt` fields.
+   * Sufficiently smart code analyzer can infer necessary shape of `data`
+   * object by looking at component's source code. And inform us that LoaderData
+   * type has more fields than necessary so overfetching is possible.
+   */
   return (
     <div className="jokes-layout">
       <header className="jokes-header">
