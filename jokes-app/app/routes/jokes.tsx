@@ -19,16 +19,29 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async () => {
+  // THIS RUNS ON THE SERVER
+
   /**
    * We are specifying by hand that data is of LoaderData type. TS will
-   * check that value returned by `await db.joke.findMany()` conforms to it.
+   * check that type returned by `await db.joke.findMany()` conforms to it.
+   * 
+   * Network type safety
+   * -------------------
+   * Although TS can check that type of `await db.joke.findMany()`
+   * conforms to LoaderData type, there is not guarantee that at runtime
+   * value of `await db.joke.findMany()` conforms to LoaderData type specified 
+   * by the JokesRoute component. So runtime validation is needed. E.g. JSON Schema.
+   * 1. first write JSON Schema
+   * 2. then generate TS types from it. Use this types on the client inside
+   *    components at useLoaderData.
+   * 3. on the server validate at runtime values from database against JSON Schema     
    */
   const data: LoaderData = {
     jokeListItems: await db.joke.findMany({
       /**
        * Assuming that code analizer has informed us
        * about data overfething we can narrow down
-       * requsted fields.
+       * requested fields.
        */
       take: 5,
       select: { id: true, name: true },
@@ -39,6 +52,8 @@ export const loader: LoaderFunction = async () => {
 };
 
 export default function JokesRoute() {
+  // THIS RUNS ON THE CLIENT
+
   /*(i)*/
   const data = useLoaderData<LoaderData>();
   /**
