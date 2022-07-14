@@ -1,4 +1,5 @@
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { Joke } from "@prisma/client";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
@@ -10,12 +11,12 @@ export const links: LinksFunction = () => {
 };
 /**
  * Specifying data needed to display page
- * Problem: we need specify this type manually
+ * Problem: we LoaderData type manually
  * later in useLoaderData hook (look at (i)) to
  * allow TS to check correct data usage in component.
  */
 type LoaderData = {
-  jokeListItems: Array<{ id: string; name: string }>;
+  jokeListItems: Array<Pick<Joke, "id" | "name">>;
 };
 
 export const loader: LoaderFunction = async () => {
@@ -24,17 +25,17 @@ export const loader: LoaderFunction = async () => {
   /**
    * We are specifying by hand that data is of LoaderData type. TS will
    * check that type returned by `await db.joke.findMany()` conforms to it.
-   * 
+   *
    * Network type safety
    * -------------------
    * Although TS can check that type of `await db.joke.findMany()`
    * conforms to LoaderData type, there is not guarantee that at runtime
-   * value of `await db.joke.findMany()` conforms to LoaderData type specified 
+   * value of `await db.joke.findMany()` conforms to LoaderData type specified
    * by the JokesRoute component. So runtime validation is needed. E.g. JSON Schema.
    * 1. first write JSON Schema
    * 2. then generate TS types from it. Use this types on the client inside
    *    components at useLoaderData.
-   * 3. on the server validate at runtime values from database against JSON Schema     
+   * 3. on the server validate at runtime values from database against JSON Schema
    */
   const data: LoaderData = {
     jokeListItems: await db.joke.findMany({
